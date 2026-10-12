@@ -18,7 +18,7 @@ def real_mongo_client():
     if version < (6, 0):
         mongo_client.close()
         pytest.fail("MongoDB 6.0+ is required for the aggregation integration tests")
-    database_name = "hronetask_test_" + uuid.uuid4().hex
+    database_name = "hronetask_" + uuid.uuid4().hex[:16]
     main.client = mongo_client
     main.db = mongo_client[database_name]
     main.ensure_indexes()

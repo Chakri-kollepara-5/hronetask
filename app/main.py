@@ -6,6 +6,7 @@ Run with:
 
 from __future__ import annotations
 
+import json
 import math
 import os
 import re
@@ -14,6 +15,7 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Any, Literal, Optional, Union
 
+from bson import json_util
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field, StrictInt, field_validator, model_validator
@@ -267,6 +269,10 @@ def explain_database_aggregate(pipeline: list[dict[str, Any]]) -> dict[str, Any]
         {"aggregate": 1, "pipeline": pipeline, "cursor": {}},
         verbosity="executionStats",
     )
+
+
+def json_safe(value: Any) -> Any:
+    return json.loads(json_util.dumps(value))
 
 
 class EmployeeCreate(BaseModel):
@@ -1109,7 +1115,7 @@ def explain_endpoint(
         explain_doc = explain_database_aggregate(pipeline)
         collection = "database"
 
-    return {"endpoint": endpoint, "collection": collection, "explain": explain_doc}
+    return {"endpoint": endpoint, "collection": collection, "explain": json_safe(explain_doc)}
 
 
 if __name__ == "__main__":
